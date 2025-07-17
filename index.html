@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Visor 3D - Chaqueta Cerezos</title>
+<meta name="theme-color" content="#9400D3" />
+
+<!-- Preload modelo (ayuda en algunos navegadores) -->
+<link rel="preload" href="Chaqueta_Cerezos.glb" as="fetch" type="model/gltf-binary" crossorigin>
+
+<!-- model-viewer -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<!-- Fuentes -->
+<link href="https://fonts.googleapis.com/css2?family=Jockey+One:ital,wght@0,400;1,900&family=Monomaniac+One:ital@1&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --brand-purple: #9400D3;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #111;
+  font-family: sans-serif;
+}
+
+/* Full-viewport visor */
+model-viewer {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  touch-action: none; /* gestos mejor controlados en móvil */
+  background: #111;   /* redundante, pero seguro */
+}
+
+/* Loader Overlay */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 999;
+  transition: opacity 0.3s ease;
+}
+
+/* Logo en el centro: escala fluida */
+#loader img {
+  width: clamp(140px, 40vw, 300px);
+  height: auto;
+  margin-bottom: 20px;
+  z-index: 2;
+}
+
+/* Spinner semicircular */
+.circle-loader {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+.circle-loader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
+  animation: rotate 1.2s linear infinite;
+}
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Bloque superior con títulos */
+#top-info {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 0px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--brand-purple);
+  text-align: center;
+  padding: 8px 16px;
+  z-index: 1000;
+  width: auto;
+  max-width: 90%;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  box-sizing: border-box;
+  pointer-events: none; /* no bloquea gestos sobre el modelo */
+}
+
+#top-info h1,
+#top-info h2,
+#top-info h3 {
+  line-height: 1.1;
+  word-break: break-word;
+  margin: 0;
+}
+
+#top-info h1 {
+  margin-top: 5px;
+  color: white;
+  font-family: 'Jockey One', sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(22px, 5vw, 40px);
+}
+
+#top-info h2 {
+  color: black;
+  font-family: 'Jockey One', sans-serif;
+  font-weight: 400;
+  font-size: clamp(14px, 4vw, 20px);
+}
+
+#top-info h3 {
+  margin-bottom: 2px;
+  color: white; /* tu versión final */
+  font-family: 'Monomaniac One', sans-serif;
+  font-style: italic;
+  font-size: clamp(11px, 3.5vw, 15px);
+}
+
+/* Ajustes extra pantallas muy pequeñas */
+@media (max-width: 480px) {
+  #top-info { padding: 6px 12px; }
+  .circle-loader { width: 48px; height: 48px; }
+}
+@media (max-width: 360px) {
+  #top-info { padding: 4px 10px; }
+}
+
+/* Reduce animaciones si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  .circle-loader::after { animation-duration: 3s; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loader con logo y animación -->
+<div id="loader" role="status" aria-live="polite" aria-label="Cargando modelo 3D">
+  <img src="Logo_JDK.png" alt="Logo de la marca JDK">
+  <div class="circle-loader" aria-hidden="true"></div>
+</div>
+
+<!-- Bloque superior con textos -->
+<div id="top-info">
+  <h1>JDK EXCLUSIVE CLOTHES</h1>
+  <h2>BALACLAVA HOODIE CHERRY BLOSSOM</h2>
+  <h3>6 units</h3>
+</div>
+
+<!-- Model Viewer -->
+<model-viewer
+  id="viewer"
+  src="Chaqueta_Cerezos_resized.glb"
+  alt="Chaqueta Cerezos"
+  camera-controls
+  auto-rotate
+  loading="lazy"
+  exposure="1"
+  camera-orbit="180deg 80deg 1.5m"
+  camera-target="0m 0.7m 0m"
+  field-of-view="30deg"
+  min-field-of-view="10deg"
+  max-field-of-view="80deg"
+  interaction-prompt="none"
+  ar
+  ar-modes="webxr scene-viewer quick-look">
+</model-viewer>
+
+<script>
+const modelViewer = document.getElementById('viewer');
+const loader = document.getElementById('loader');
+
+/* Oculta loader cuando el modelo terminó de cargar */
+modelViewer.addEventListener('load', () => {
+  loader.style.opacity = '0';
+  setTimeout(() => loader.style.display = 'none', 300);
+});
+
+/* Opcional: Pausa autorrotación tras interacción (ahorra batería en móvil) */
+modelViewer.addEventListener('interaction', () => {
+  modelViewer.autoRotate = false;
+});
+</script>
+
+</body>
+</html>
